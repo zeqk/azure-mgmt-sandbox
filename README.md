@@ -1,5 +1,9 @@
 This project is to try out the use of Terraform in Azure Cloud
 
+Requirements:
+- Powershell
+- Azure CLI
+- Terraform
 ## Create state storage 
 
 ```powershell
