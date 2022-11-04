@@ -14,21 +14,15 @@ resource "azurerm_postgresql_flexible_server" "webapi01" {
   version                = "14"
   storage_mb             = 32768
   sku_name               = "B_Standard_B1ms"
+  zone                   = "1"
   tags = {
     Environment = var.env.name
   }
 }
 
 resource "azurerm_postgresql_flexible_server_database" "webapi" {
-  name      = "psqldb-waarra-${var.env.abbreviation}-${var.location.abbreviation}"
+  name      = "psqldb-wasute-${var.env.abbreviation}-${var.location.abbreviation}"
   server_id = azurerm_postgresql_flexible_server.webapi01.id
   collation = "en_US.utf8"
   charset   = "utf8"
-}
-
-resource "azurerm_postgresql_flexible_server_firewall_rule" "azure" {
-  name             = "allow-access-from-azure-services"
-  server_id        = azurerm_postgresql_flexible_server.webapi01.id
-  start_ip_address = "0.0.0.0"
-  end_ip_address   = "0.0.0.0"
 }
