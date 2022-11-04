@@ -65,6 +65,9 @@ terraform -chdir="./sandbox" plan -destroy
 # Destroy
 terraform -chdir="./sandbox" destroy -auto-approve
 
+# Show output
+terraform -chdir="./sandbox" output webapi_pgpassword
+
 ```
 
 ## Other commands
