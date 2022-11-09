@@ -9,7 +9,7 @@ resource "azurerm_postgresql_flexible_server" "webapi01" {
   name                   = "psql-wa01-${var.env.abbreviation}-${var.location.abbreviation}"
   resource_group_name    = data.azurerm_resource_group.rg.name
   location               = data.azurerm_resource_group.rg.location
-  administrator_login    = "psqladmin"
+  administrator_login    = "postgres"
   administrator_password = random_password.password.result
   version                = "14"
   storage_mb             = 32768
@@ -25,4 +25,10 @@ resource "azurerm_postgresql_flexible_server_database" "webapi" {
   server_id = azurerm_postgresql_flexible_server.webapi01.id
   collation = "en_US.utf8"
   charset   = "utf8"
+}
+
+resource "azurerm_postgresql_flexible_server_configuration" "webapi01" {
+  name      = "azure.extensions"
+  server_id = azurerm_postgresql_flexible_server.webapi01.id
+  value     = "TABLEFUNC,UNACCENT,UUID-OSSP"
 }
