@@ -9,7 +9,7 @@ resource "azurerm_postgresql_flexible_server" "webapi01" {
   name                   = "psql-wa01-${var.env.abbreviation}-${var.location.abbreviation}"
   resource_group_name    = data.azurerm_resource_group.rg.name
   location               = data.azurerm_resource_group.rg.location
-  administrator_login    = "postgres"
+  administrator_login    = "dbadmin"
   administrator_password = random_password.password.result
   version                = "14"
   storage_mb             = 32768
