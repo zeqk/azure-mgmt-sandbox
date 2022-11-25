@@ -3,14 +3,15 @@ resource "azurerm_kubernetes_cluster" "ci_tools" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   dns_prefix          = "akscitools"
+  oidc_issuer_enabled = true
   network_profile {
-    network_plugin = "kubenet"
+    network_plugin    = "kubenet"
     load_balancer_sku = "basic"
   }
 
   default_node_pool {
     name       = "default"
-    node_count = 1
+    node_count = 2
     vm_size    = "Standard_B2s"
   }
 
