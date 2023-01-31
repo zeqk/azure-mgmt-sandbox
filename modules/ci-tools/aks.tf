@@ -1,25 +1,25 @@
-resource "azurerm_kubernetes_cluster" "ci_tools" {
-  name                = "aks-citools-${var.env.abbreviation}-${var.location.abbreviation}"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-  dns_prefix          = "akscitools"
-  oidc_issuer_enabled = true
-  network_profile {
-    network_plugin    = "kubenet"
-    load_balancer_sku = "basic"
-  }
+# resource "azurerm_kubernetes_cluster" "ci_tools" {
+#   name                = "aks-citools-${var.env.abbreviation}-${var.location.abbreviation}"
+#   location            = data.azurerm_resource_group.rg.location
+#   resource_group_name = data.azurerm_resource_group.rg.name
+#   dns_prefix          = "akscitools"
+#   oidc_issuer_enabled = true
+#   network_profile {
+#     network_plugin    = "kubenet"
+#     load_balancer_sku = "basic"
+#   }
 
-  default_node_pool {
-    name       = "default"
-    node_count = 2
-    vm_size    = "Standard_B2s"
-  }
+#   default_node_pool {
+#     name       = "default"
+#     node_count = 2
+#     vm_size    = "Standard_B2s"
+#   }
 
-  identity {
-    type = "SystemAssigned"
-  }
+#   identity {
+#     type = "SystemAssigned"
+#   }
 
-  tags = {
-    Environment = var.env.name
-  }
-}
+#   tags = {
+#     Environment = var.env.name
+#   }
+# }
