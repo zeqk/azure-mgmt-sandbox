@@ -15,13 +15,13 @@ resource "azurerm_subnet" "example" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
-# # Public IP
-# resource "azurerm_public_ip" "public_ip" {
-#   name                = "vm_public_ip"
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   location            = data.azurerm_resource_group.rg.location
-#   allocation_method   = "Dynamic"
-# }
+# Public IP
+resource "azurerm_public_ip" "public_ip" {
+  name                = "vm_public_ip"
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  allocation_method   = "Dynamic"
+}
 
 # Network Interface (NIC)
 resource "azurerm_network_interface" "example" {
@@ -33,35 +33,35 @@ resource "azurerm_network_interface" "example" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.example.id
     private_ip_address_allocation = "Dynamic"
-    # public_ip_address_id          = azurerm_public_ip.public_ip.id
+    public_ip_address_id          = azurerm_public_ip.public_ip.id
   }
 }
 
-# # Network Security Group (NSG)
-# # Allow SSH Connection
-# resource "azurerm_network_security_group" "nsg" {
-#   name                = "ssh_nsg"
-#   location            = data.azurerm_resource_group.rg.location
-#   resource_group_name = data.azurerm_resource_group.rg.name
+# Network Security Group (NSG)
+# Allow SSH Connection
+resource "azurerm_network_security_group" "nsg" {
+  name                = "ssh_nsg"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
 
-#   security_rule {
-#     name                       = "allow_ssh_sg"
-#     priority                   = 100
-#     direction                  = "Inbound"
-#     access                     = "Allow"
-#     protocol                   = "Tcp"
-#     source_port_range          = "*"
-#     destination_port_range     = "22"
-#     source_address_prefix      = "*"
-#     destination_address_prefix = "*"
-#   }
-# }
+  security_rule {
+    name                       = "allow_ssh_sg"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
 
-# # Associate NSG with NIC
-# resource "azurerm_network_interface_security_group_association" "association" {
-#   network_interface_id      = azurerm_network_interface.example.id
-#   network_security_group_id = azurerm_network_security_group.nsg.id
-# }
+# Associate NSG with NIC
+resource "azurerm_network_interface_security_group_association" "association" {
+  network_interface_id      = azurerm_network_interface.example.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
 
 resource "random_password" "vm_password" {
   length  = 16
@@ -74,7 +74,13 @@ resource "azurerm_linux_virtual_machine" "example" {
   location            = data.azurerm_resource_group.rg.location
   size                = "Standard_B1s"
   admin_username      = "adminuser"
-  admin_password      = random_password.vm_password.result
+  # admin_password                  = random_password.vm_password.result
+  # disable_password_authentication = false
+
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
 
   network_interface_ids = [
     azurerm_network_interface.example.id,
