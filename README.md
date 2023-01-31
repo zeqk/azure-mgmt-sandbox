@@ -43,13 +43,34 @@ terraform -chdir="./sandbox" init `
     -backend-config="access_key=$ACCESS_KEY"
 ```
 
+```bash
+PROD_SUBSCRIPTION_ID=$(az account list --query "[?name == 'Sistemas - Production'].id" -o tsv)
+ACCOUNT_KEY=$(az storage account keys list --subscription $PROD_SUBSCRIPTION_ID --resource-group "rg-tfstates-iprd-ue" --account-name "sremanuallymanaged" --query '[0].value' -o tsv)
+
+echo $PROD_SUBSCRIPTION_ID
+echo $ACCOUNT_KEY
+
+terraform -chdir="./sandbox" init \
+    -backend-config="subscription_id=$PROD_SUBSCRIPTION_ID" \
+    -backend-config="access_key=$ACCESS_KEY"
+```
+
 ## Deploy
 
 ```powershell
 # Set variables
 $env:TF_VAR_tenant_id=(az account list --query "[?name == ``Sistemas - Non Production``].tenantId" -o tsv)
 $env:TF_VAR_subscription_id=(az account list --query "[?name == ``Sistemas - Non Production``].id" -o tsv)
+```
 
+```bash
+# Set variables
+export TF_VAR_tenant_id=$(az account list --query "[?name == 'Sistemas - Non Production'].tenantId" -o tsv) && \
+export TF_VAR_subscription_id=$(az account list --query "[?name == 'Sistemas - Non Production'].id" -o tsv) && \
+echo $TF_VAR_tenant_id && echo $TF_VAR_subscription_id
+```
+
+```console
 # Validate
 terraform -chdir="./sandbox" validate
 
