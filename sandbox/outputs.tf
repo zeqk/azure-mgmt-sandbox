@@ -3,6 +3,6 @@
 #   sensitive = true
 # }
 
-output "public_ip" {
-  value = module.vmexample.public_ip
-}
+# output "public_ip" {
+#   value = module.vmexample.public_ip
+# }
