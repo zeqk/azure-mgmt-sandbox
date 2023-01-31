@@ -36,15 +36,15 @@ module "webapi" {
 
 module "vmexample" {
   source = "../modules/vm-example"
-  location = {
-    abbreviation = "ue"
-    name         = "eastus"
-  }
-  env = {
-    abbreviation = local.env_abbreviation
-    name         = local.env_name
-  }
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
+  # location = {
+  #   abbreviation = "ue"
+  #   name         = "eastus"
+  # }
+  # env = {
+  #   abbreviation = local.env_abbreviation
+  #   name         = local.env_name
+  # }
+  # subscription_id = var.subscription_id
+  # tenant_id       = var.tenant_id
   rgName          = local.rgName
 }
