@@ -11,5 +11,5 @@ data "azurerm_resource_group" "rg" {
 
 data "azurerm_key_vault" "wasute" {
   name                = "kv-wasute-tst-ue"
-  resource_group_name = "rg-webapi-tst-ue"
+  resource_group_name = "rg-test-ue"
 }

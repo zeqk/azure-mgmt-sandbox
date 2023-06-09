@@ -8,8 +8,8 @@ Requirements:
 
 ```powershell
 $RESOURCE_GROUP_NAME="rg-tfstates-iprd-ue"
-$STORAGE_ACCOUNT_NAME="sremanuallymanaged"
-$CONTAINER_NAME="terraformstates"
+$STORAGE_ACCOUNT_NAME="sttfstatesiprdue"
+$CONTAINER_NAME="tfstates"
 
 # Create resource group
 # az group create --name $RESOURCE_GROUP_NAME --location eastus
@@ -29,46 +29,70 @@ echo "access_key: $ACCOUNT_KEY"
 
 ```
 
+### Load vars
+
+Powershell
+
+```powershell
+$TENANT_ID=(az account list --query "[?name == ``Sistemas - Production``].tenantId" -o tsv)
+$PROD_SUBSCRIPTION_ID=(az account list --query "[?name == ``Sistemas - Production``].id" -o tsv)
+$NONPROD_SUBSCRIPTION_ID=(az account list --query "[?name == ``Sistemas - Non Production``].id" -o tsv)
+$RESOURCE_GROUP_NAME="rg-tfstates-iprd-ue"
+$STORAGE_ACCOUNT_NAME="sttfstatesiprdue"
+$STORAGE_CONTAINER_NAME="tfstates"
+$STATE_FILE_PATH="azure-cloud-sandbox/terraform.tfstate"
+$STORAGE_ACCOUNT_KEY=(az storage account keys list `
+                        --subscription $PROD_SUBSCRIPTION_ID `
+                        --resource-group $RESOURCE_GROUP_NAME `
+                        --account-name $STORAGE_ACCOUNT_NAME `
+                        --query '[0].value' -o tsv)
+$env:TF_VAR_tenant_id="$TENANT_ID"
+$env:TF_VAR_subscription_id="$NONPROD_SUBSCRIPTION_ID"
+
+```
+
+Bash
+
+```bash
+TENANT_ID=$(az account list --query "[?name == 'Sistemas - Production'].tenantId" -o tsv)
+PROD_SUBSCRIPTION_ID=$(az account list --query "[?name == 'Sistemas - Production'].id" -o tsv)
+NONPROD_SUBSCRIPTION_ID=$(az account list --query "[?name == 'Sistemas - Non Production'].id" -o tsv)
+RESOURCE_GROUP_NAME="rg-tfstates-iprd-ue"
+STORAGE_ACCOUNT_NAME="sttfstatesiprdue"
+STORAGE_CONTAINER_NAME="tfstates"
+STATE_FILE_PATH="azure-cloud-sandbox/terraform.tfstate"
+STORAGE_ACCOUNT_KEY=$(az storage account keys list \
+                        --subscription $PROD_SUBSCRIPTION_ID \
+                        --resource-group "$RESOURCE_GROUP_NAME" \
+                        --account-name "$STORAGE_ACCOUNT_NAME" \
+                        --query '[0].value' -o tsv)
+export TF_VAR_tenant_id="$TENANT_ID"
+export TF_VAR_subscription_id="$NONPROD_SUBSCRIPTION_ID"
+
+```
+
 ## Init
 
 ```powershell
-$PROD_SUBSCRIPTION_ID=(az account list --query "[?name == ``Sistemas - Production``].id" -o tsv)
-$ACCOUNT_KEY=(az storage account keys list --subscription $PROD_SUBSCRIPTION_ID --resource-group "rg-tfstates-iprd-ue" --account-name "sremanuallymanaged" --query '[0].value' -o tsv)
-
-echo $PROD_SUBSCRIPTION_ID
-echo $ACCOUNT_KEY
-
-terraform -chdir="./sandbox" init `
-    -backend-config="subscription_id=$PROD_SUBSCRIPTION_ID" `
-    -backend-config="access_key=$ACCESS_KEY"
+terraform -chdir="./sandbox" init \
+    -backend-config="resource_group_name=$RESOURCE_GROUP_NAME" `
+    -backend-config="storage_account_name=$STORAGE_ACCOUNT_NAME" `
+    -backend-config="container_name=$STORAGE_CONTAINER_NAME" `
+    -backend-config="key=$STATE_FILE_PATH" `
+    -backend-config="access_key=$STORAGE_ACCOUNT_KEY"
 ```
 
 ```bash
-PROD_SUBSCRIPTION_ID=$(az account list --query "[?name == 'Sistemas - Production'].id" -o tsv)
-ACCOUNT_KEY=$(az storage account keys list --subscription $PROD_SUBSCRIPTION_ID --resource-group "rg-tfstates-iprd-ue" --account-name "sremanuallymanaged" --query '[0].value' -o tsv)
-
-echo $PROD_SUBSCRIPTION_ID
-echo $ACCOUNT_KEY
-
 terraform -chdir="./sandbox" init \
-    -backend-config="subscription_id=$PROD_SUBSCRIPTION_ID" \
-    -backend-config="access_key=$ACCESS_KEY"
+    -backend-config="resource_group_name=$RESOURCE_GROUP_NAME" \
+    -backend-config="storage_account_name=$STORAGE_ACCOUNT_NAME" \
+    -backend-config="container_name=$STORAGE_CONTAINER_NAME" \
+    -backend-config="key=$STATE_FILE_PATH" \
+    -backend-config="access_key=$STORAGE_ACCOUNT_KEY"
 ```
 
 ## Deploy
 
-```powershell
-# Set variables
-$env:TF_VAR_tenant_id=(az account list --query "[?name == ``Sistemas - Non Production``].tenantId" -o tsv)
-$env:TF_VAR_subscription_id=(az account list --query "[?name == ``Sistemas - Non Production``].id" -o tsv)
-```
-
-```bash
-# Set variables
-export TF_VAR_tenant_id=$(az account list --query "[?name == 'Sistemas - Non Production'].tenantId" -o tsv) && \
-export TF_VAR_subscription_id=$(az account list --query "[?name == 'Sistemas - Non Production'].id" -o tsv) && \
-echo $TF_VAR_tenant_id && echo $TF_VAR_subscription_id
-```
 
 ```console
 # Validate
